@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Prompt Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Karla:wght@300;400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* ── THEMES ─────────────────────────────────────────────── */
+:root {
+  --bg:#0a0a12; --surface:#12121e; --surface2:#1a1a2e;
+  --accent:#5b6af0; --accent2:#8b9af8;
+  --text:#e8e4f0; --muted:#6a6480; --border:#252535;
+  --btn-active-text:#ffffff;
+}
+body.theme-charcoal {
+  --bg:#111; --surface:#1a1a1a; --surface2:#222;
+  --accent:#d0d0d0; --accent2:#f0f0f0;
+  --text:#f0f0f0; --muted:#888; --border:#333;
+  --btn-active-text:#111;
+}
+body.theme-blackout {
+  --bg:#000; --surface:#0f0f0f; --surface2:#161616;
+  --accent:#e8b84b; --accent2:#f0cc72;
+  --text:#f0ece4; --muted:#6a6050; --border:#1f1f1f;
+  --btn-active-text:#000;
+}
+body.theme-rust {
+  --bg:#1a0e08; --surface:#241410; --surface2:#2e1c14;
+  --accent:#c4552a; --accent2:#e07050;
+  --text:#f0e0d0; --muted:#8a6050; --border:#3a2418;
+  --btn-active-text:#fff;
+}
+body.theme-forest {
+  --bg:#080f08; --surface:#0f160f; --surface2:#161e16;
+  --accent:#4a7a42; --accent2:#70a868;
+  --text:#d8e8d0; --muted:#5a7050; --border:#1e2a1e;
+  --btn-active-text:#fff;
+}
+body.theme-sand {
+  --bg:#1a1610; --surface:#241e14; --surface2:#2e261a;
+  --accent:#c4a45a; --accent2:#e0c080;
+  --text:#f0e8d0; --muted:#8a7850; --border:#3a3020;
+  --btn-active-text:#1a1610;
+}
+body.theme-slate {
+  --bg:#0a0e12; --surface:#121620; --surface2:#1a1e2e;
+  --accent:#4a7ab8; --accent2:#70a0d8;
+  --text:#d0d8e8; --muted:#5a6878; --border:#202840;
+  --btn-active-text:#fff;
+}
+body.theme-fog {
+  --bg:#f0eef4; --surface:#e8e6f0; --surface2:#dddae8;
+  --accent:#7060a8; --accent2:#9080c0;
+  --text:#282838; --muted:#8080a0; --border:#c8c6d8;
+  --btn-active-text:#fff;
+}
+body.theme-dusk {
+  --bg:#12080e; --surface:#1c1018; --surface2:#261420;
+  --accent:#a060b0; --accent2:#c080d0;
+  --text:#e8d0f0; --muted:#7050a0; --border:#301830;
+  --btn-active-text:#fff;
+}
+body.theme-neonnoir {
+  --bg:#080810; --surface:#0e0e18; --surface2:#141420;
+  --accent:#00d4ff; --accent2:#60e8ff;
+  --text:#e0f0ff; --muted:#405060; --border:#1a1a28;
+  --btn-active-text:#080810;
+}
+body.theme-copper {
+  --bg:#100a06; --surface:#180e08; --surface2:#20120a;
+  --accent:#b07840; --accent2:#d09858;
+  --text:#e8d8c0; --muted:#806040; --border:#281808;
+  --btn-active-text:#100a06;
+}
+
+/* ── BASE ───────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Karla', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(10px);
+}
+.header-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.08em; color: var(--accent2); }
+.header-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.2em; margin-top: 1px; }
+.header-right { display: flex; gap: 10px; align-items: center; }
+
+/* ── THEME SWITCHER ─────────────────────────────────────── */
+.theme-btn {
+  padding: 7px 16px; border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Karla', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── MAIN LAYOUT ────────────────────────────────────────── */
+.main { max-width: 900px; margin: 0 auto; padding: 40px 32px 80px; }
+
+/* ── SECTION ────────────────────────────────────────────── */
+.section {
+  margin-bottom: 48px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--border);
+}
+.section:last-of-type { border-bottom: none; }
+.section-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 0.12em;
+  color: var(--accent2);
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 12px;
+}
+.section-header::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+.field { margin-bottom: 22px; }
+.field-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 10px;
+  display: block;
+}
+.field-note { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
+
+/* ── BUTTONS ────────────────────────────────────────────── */
+.btn-group { display: flex; flex-wrap: wrap; gap: 7px; }
+.btn {
+  padding: 7px 15px; border-radius: 5px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Karla', sans-serif; font-size: 13px;
+  cursor: pointer; transition: all 0.12s;
+  white-space: nowrap; user-select: none;
+}
+.btn:hover { border-color: var(--accent); color: var(--text); background: var(--surface2); }
+.btn.active {
+  background: var(--accent); border-color: var(--accent);
+  color: var(--btn-active-text); font-weight: 600;
+}
+.btn.pill { border-radius: 20px; padding: 7px 18px; }
+.btn.archetype.active { color: #fff; }
+
+/* ── SELECT ─────────────────────────────────────────────── */
+select {
+  padding: 8px 14px; border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--surface); color: var(--text);
+  font-family: 'Karla', sans-serif; font-size: 13px;
+  cursor: pointer; outline: none; min-width: 180px;
+  transition: border-color 0.12s;
+}
+select:focus { border-color: var(--accent); }
+
+/* ── COLOR PALETTE PILLS ────────────────────────────────── */
+.palette-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.palette-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Karla', sans-serif; font-size: 12px;
+  cursor: pointer; transition: all 0.12s;
+}
+.palette-pill:hover { border-color: var(--accent); color: var(--text); }
+.palette-pill.active { border-color: var(--accent); color: var(--text); background: var(--surface2); font-weight: 600; }
+.palette-swatch {
+  width: 28px; height: 14px; border-radius: 3px;
+  display: inline-block; flex-shrink: 0;
+}
+
+/* ── POSE GRID ──────────────────────────────────────────── */
+.pose-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 600px) { .pose-grid { grid-template-columns: 1fr; } }
+
+/* ── ENVIRONMENT TYPE ───────────────────────────────────── */
+.env-type-btns { display: flex; gap: 10px; margin-bottom: 16px; }
+.env-type-btn {
+  padding: 10px 28px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 0.1em;
+  cursor: pointer; transition: all 0.15s;
+}
+.env-type-btn:hover { border-color: var(--accent); color: var(--text); }
+.env-type-btn.active { background: var(--accent); border-color: var(--accent); color: var(--btn-active-text); }
+
+/* ── OCCUPATION PREFILL NOTE ────────────────────────────── */
+.prefill-note {
+  padding: 8px 14px; border-radius: 5px;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+  margin-top: 8px; display: none;
+}
+.prefill-note.visible { display: block; }
+
+/* ── OUTPUT ─────────────────────────────────────────────── */
+.output-section { margin-top: 48px; }
+.output-box {
+  background: #000;
+  border: 1px solid #00ff41;
+  border-radius: 8px;
+  padding: 24px;
+  min-height: 120px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,255,65,0.1);
+}
+.output-label {
+  font-family: 'VT323', monospace;
+  font-size: 14px; color: #00aa28;
+  letter-spacing: 0.1em; margin-bottom: 10px;
+}
+.output-text {
+  font-family: 'VT323', monospace;
+  font-size: 20px; line-height: 1.6;
+  color: #00ff41;
+  word-break: break-word;
+  min-height: 60px;
+}
+.output-text.empty { color: #003a0f; font-style: italic; }
+.output-cursor {
+  display: inline-block; width: 10px; height: 18px;
+  background: #00ff41; margin-left: 2px;
+  animation: blink 1s step-end infinite;
+  vertical-align: bottom;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.output-actions {
+  display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap;
+}
+.copy-btn {
+  padding: 8px 20px; border-radius: 5px;
+  border: 1px solid #00ff41;
+  background: transparent; color: #00ff41;
+  font-family: 'VT323', monospace; font-size: 18px;
+  cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em;
+}
+.copy-btn:hover { background: #00ff41; color: #000; }
+.copy-btn.copied { background: #00ff41; color: #000; }
+.save-input {
+  padding: 7px 12px; border-radius: 5px;
+  border: 1px solid #00aa28;
+  background: #000; color: #00ff41;
+  font-family: 'VT323', monospace; font-size: 16px;
+  outline: none; width: 200px; letter-spacing: 0.05em;
+}
+.save-input::placeholder { color: #003a0f; }
+.save-btn {
+  padding: 8px 20px; border-radius: 5px;
+  border: 1px solid #00aa28;
+  background: transparent; color: #00aa28;
+  font-family: 'VT323', monospace; font-size: 18px;
+  cursor: pointer; transition: all 0.15s;
+}
+.save-btn:hover { border-color: #00ff41; color: #00ff41; }
+
+/* ── GENERATE BUTTONS ───────────────────────────────────── */
+.generate-row {
+  display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap;
+}
+.generate-btn {
+  padding: 16px 36px; border-radius: 8px;
+  border: none;
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.12em;
+  cursor: pointer; transition: all 0.15s;
+}
+.generate-btn.primary {
+  background: var(--accent); color: var(--btn-active-text);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.generate-btn.primary:hover { background: var(--accent2); transform: translateY(-1px); }
+.generate-btn.secondary {
+  background: transparent; color: var(--accent);
+  border: 2px solid var(--accent);
+}
+.generate-btn.secondary:hover { background: var(--surface2); }
+.reset-btn {
+  padding: 16px 24px; border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.12em;
+  cursor: pointer; transition: all 0.15s;
+}
+.reset-btn:hover { border-color: var(--muted); color: var(--text); }
+.randomize-btn {
+  padding: 16px 24px; border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.12em;
+  cursor: pointer; transition: all 0.15s;
+}
+.randomize-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── SAVED PANEL ────────────────────────────────────────── */
+.saved-toggle {
+  padding: 7px 16px; border-radius: 5px;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  font-family: 'Karla', sans-serif; font-size: 13px;
+  cursor: pointer; transition: all 0.15s;
+}
+.saved-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.saved-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 16px;
+  display: none;
+}
+.saved-panel.open { display: block; }
+.saved-item {
+  padding: 12px; border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  margin-bottom: 8px;
+}
+.saved-item-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+.saved-item-preview { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 8px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.saved-item-actions { display: flex; gap: 6px; }
+.load-btn { flex: 1; padding: 5px; border-radius: 4px; border: none; background: var(--accent); color: var(--btn-active-text); font-family: 'Karla', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; }
+.del-btn { padding: 5px 10px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; }
+
+/* ── MISC ───────────────────────────────────────────────── */
+.row { display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.hidden { display: none !important; }
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="header-title">Image Prompt Builder</div>
+    <div class="header-sub">DALL-E · PHOTOREALISTIC · INDIVIDUAL</div>
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" onclick="cycleTheme()">⬡ Theme</button>
+    <button class="saved-toggle" onclick="toggleSaved()">Saved (<span id="saved-count">0</span>)</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SAVED PANEL -->
+  <div class="saved-panel" id="saved-panel">
+    <div class="field-label">Saved Prompts</div>
+    <div id="saved-list"><span style="color:var(--muted);font-size:13px;">No saved prompts yet.</span></div>
+  </div>
+
+  <!-- ── 1. ARCHETYPE ── -->
+  <div class="section">
+    <div class="section-header">Archetype</div>
+    <div class="field">
+      <span class="field-label">Individual Mood — select any combination</span>
+      <div class="btn-group" id="archetype-group"></div>
+    </div>
+  </div>
+
+  <!-- ── 2. CHARACTER ── -->
+  <div class="section">
+    <div class="section-header">Character</div>
+
+    <div class="field">
+      <span class="field-label">Gender</span>
+      <div class="btn-group" id="gender-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Age Range</span>
+      <div class="row">
+        <div class="btn-group" id="age-range-group"></div>
+        <select id="age-year-select" class="hidden">
+          <option value="">Specific age...</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Ethnicity</span>
+      <select id="ethnicity-select">
+        <option value="">Select ethnicity...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Body Type</span>
+      <div class="btn-group" id="body-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Attractiveness</span>
+      <select id="attract-select">
+        <option value="">Select level...</option>
+      </select>
+    </div>
+
+    <hr class="divider">
+    <div class="field-label" style="margin-bottom:16px;">Pose & Body Language</div>
+
+    <div class="pose-grid">
+      <div class="field">
+        <span class="field-label">Camera Facing</span>
+        <div class="btn-group" id="pose-facing-group"></div>
+      </div>
+      <div class="field">
+        <span class="field-label">Body Position</span>
+        <div class="btn-group" id="pose-body-group"></div>
+      </div>
+      <div class="field">
+        <span class="field-label">Arms & Hands</span>
+        <div class="btn-group" id="pose-arms-group"></div>
+      </div>
+      <div class="field">
+        <span class="field-label">Head & Gaze</span>
+        <div class="btn-group" id="pose-head-group"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. HAIR ── -->
+  <div class="section">
+    <div class="section-header">Hair</div>
+
+    <div class="field">
+      <span class="field-label">Style</span>
+      <div class="btn-group" id="hair-style-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Color</span>
+      <div class="btn-group" id="hair-color-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Texture & Thickness</span>
+      <div class="btn-group" id="hair-texture-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Position</span>
+      <div class="btn-group" id="hair-pos-group"></div>
+    </div>
+  </div>
+
+  <!-- ── 4. OUTFIT ── -->
+  <div class="section">
+    <div class="section-header">Outfit</div>
+
+    <div class="field">
+      <span class="field-label">Occupation — optional, pre-fills style fields</span>
+      <div class="btn-group" id="occupation-group"></div>
+      <div class="prefill-note" id="prefill-note"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Overall Style</span>
+      <div class="btn-group" id="style-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Top</span>
+      <div class="btn-group" id="top-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Top Fit</span>
+      <div class="btn-group" id="top-fit-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Bottom</span>
+      <div class="btn-group" id="bottom-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Bottom Fit</span>
+      <div class="btn-group" id="bottom-fit-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Outerwear</span>
+      <div class="btn-group" id="outer-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Color Palette</span>
+      <div class="palette-grid" id="palette-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Footwear</span>
+      <div class="btn-group" id="footwear-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Accessories — select any that apply</span>
+      <div class="btn-group" id="accessories-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Mannequin Mode</span>
+      <div class="btn-group">
+        <button class="btn" id="mannequin-btn" onclick="toggleMannequin()">Mannequin</button>
+      </div>
+      <div class="field-note">Hyperdetailed face, smooth featureless body, no clothing.</div>
+    </div>
+  </div>
+
+  <!-- ── 5. ENVIRONMENT ── -->
+  <div class="section">
+    <div class="section-header">Environment</div>
+
+    <div class="field">
+      <span class="field-label">Setting Type</span>
+      <div class="env-type-btns">
+        <button class="env-type-btn" id="env-outdoor-btn" onclick="setEnvType('outdoor')">Outdoor</button>
+        <button class="env-type-btn" id="env-indoor-btn" onclick="setEnvType('indoor')">Indoor</button>
+      </div>
+    </div>
+
+    <div class="field" id="env-location-field">
+      <span class="field-label">Specific Location</span>
+      <div class="btn-group" id="env-location-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Time of Day</span>
+      <div class="btn-group" id="env-time-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Weather</span>
+      <div class="btn-group" id="env-weather-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Season</span>
+      <div class="btn-group" id="env-season-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Lighting — select all that apply</span>
+      <div class="btn-group" id="env-lighting-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Overall Vibe — environment only</span>
+      <div class="btn-group" id="env-vibe-group"></div>
+    </div>
+  </div>
+
+  <!-- ── 6. CAMERA ── -->
+  <div class="section">
+    <div class="section-header">Camera</div>
+
+    <div class="field">
+      <span class="field-label">Shot Type</span>
+      <div class="btn-group" id="shot-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Film & Aesthetic</span>
+      <div class="btn-group" id="film-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Aspect Ratio</span>
+      <div class="btn-group" id="ratio-group"></div>
+    </div>
+
+    <div class="field">
+      <span class="field-label">Depth of Field</span>
+      <div class="btn-group" id="dof-group"></div>
+    </div>
+  </div>
+
+  <!-- ── OUTPUT ── -->
+  <div class="output-section">
+    <div class="output-box">
+      <div class="output-label">&gt; DALL-E PROMPT OUTPUT</div>
+      <div class="output-text empty" id="output-text">Awaiting generation...<span class="output-cursor"></span></div>
+    </div>
+    <div class="output-actions">
+      <button class="copy-btn" onclick="copyPrompt()">[ COPY ]</button>
+      <input class="save-input" id="save-name-input" placeholder="Name this prompt..." />
+      <button class="save-btn" onclick="savePrompt()">[ SAVE ]</button>
+    </div>
+  </div>
+
+  <!-- ── GENERATE BUTTONS ── -->
+  <div class="generate-row">
+    <button class="generate-btn primary" onclick="generateIndividual()">Generate Individual</button>
+    <button class="generate-btn secondary" onclick="generateEnvironment()">Generate Environment</button>
+    <button class="randomize-btn" onclick="randomize()">⚄ Randomize</button>
+    <button class="reset-btn" onclick="resetAll()">Reset All</button>
+  </div>
+
+</div>
+
+<script>
+// ── THEMES ────────────────────────────────────────────────
+const THEMES = ['default','charcoal','blackout','rust','forest','sand','slate','fog','dusk','neonnoir','copper'];
+let themeIdx = 0;
+function cycleTheme() {
+  themeIdx = (themeIdx + 1) % THEMES.length;
+  document.body.className = themeIdx === 0 ? '' : 'theme-' + THEMES[themeIdx];
+  localStorage.setItem('ipb-theme', themeIdx);
+}
+(function initTheme() {
+  const saved = localStorage.getItem('ipb-theme');
+  if (saved) { themeIdx = parseInt(saved); document.body.className = themeIdx === 0 ? '' : 'theme-' + THEMES[themeIdx]; }
+})();
+
+// ── DATA ──────────────────────────────────────────────────
+const DATA = {
+  archetypes: [
+    {id:'confident',label:'Confident',color:'#4a7ab8'},
+    {id:'fierce',label:'Fierce',color:'#b84a4a'},
+    {id:'sultry',label:'Sultry',color:'#8a4a7a'},
+    {id:'playful',label:'Playful',color:'#4a8a5a'},
+    {id:'brooding',label:'Brooding',color:'#4a4a6a'},
+    {id:'radiant',label:'Radiant',color:'#b89a30'},
+    {id:'raw',label:'Raw',color:'#7a5a3a'},
+    {id:'soft',label:'Soft',color:'#8a7aa0'},
+    {id:'guarded',label:'Guarded',color:'#506070'},
+    {id:'untamed',label:'Untamed',color:'#6a8a3a'},
+    {id:'refined',label:'Refined',color:'#808060'},
+    {id:'magnetic',label:'Magnetic',color:'#7a3a8a'},
+  ],
+  archetypeMoods: {
+    confident: 'exuding self-assurance and poise',
+    fierce: 'with an intense, powerful presence',
+    sultry: 'with a smoldering, magnetic energy',
+    playful: 'with a light, carefree and joyful energy',
+    brooding: 'with a dark, introspective and moody presence',
+    radiant: 'glowing with warmth and natural charisma',
+    raw: 'with an unfiltered, authentic and gritty presence',
+    soft: 'with a gentle, tender and approachable warmth',
+    guarded: 'with a reserved, mysterious and watchful demeanor',
+    untamed: 'with a wild, free-spirited and unrestrained energy',
+    refined: 'with an elegant, composed and sophisticated air',
+    magnetic: 'with an irresistible, commanding and captivating presence',
+  },
+  genders: ['Male','Female'],
+  ageRanges: ['Teens','20s','30s','40s','50s','60s+'],
+  ageYears: {
+    'Teens': Array.from({length:6},(_,i)=>13+i),
+    '20s': Array.from({length:10},(_,i)=>20+i),
+    '30s': Array.from({length:10},(_,i)=>30+i),
+    '40s': Array.from({length:10},(_,i)=>40+i),
+    '50s': Array.from({length:10},(_,i)=>50+i),
+    '60s+': Array.from({length:10},(_,i)=>60+i),
+  },
+  ethnicities: ['East Asian','South Asian','Southeast Asian','Middle Eastern','Black / African','Latino / Hispanic','White / Caucasian','Mixed Heritage','Pacific Islander','Indigenous / Native'],
+  bodyTypes: ['Slim','Athletic','Average','Curvy','Muscular','Plus-Size','Petite','Tall & Lean'],
+  attractiveness: ['Natural / Everyday','Conventionally Attractive','Striking','Gorgeous','Breathtaking','Character-Driven'],
+  poseFacing: ['Facing Camera Directly','Angled 3/4 Left','Angled 3/4 Right','Profile Left','Profile Right','Looking Over Left Shoulder','Looking Over Right Shoulder','Facing Away'],
+  poseBody: ['Standing Straight','Weight on One Leg','Leaning Forward','Leaning Back','Leaning Against Surface','Seated','Crouching / Low','Mid-Stride','Kneeling','Lying Down'],
+  poseArms: ['Arms at Sides','Arms Crossed','One Hand on Hip','Both Hands on Hips','Hands Clasped in Front','One Arm Raised','Hands Behind Back','Reaching Forward','One Hand on Face','Arms Behind Head'],
+  poseHead: ['Direct Eye Contact','Looking Down','Looking Up','Looking Away Left','Looking Away Right','Eyes Closed','Head Tilted','Chin Down','Head Back'],
+  hairStyles: ['Short & Neat','Short & Messy','Buzz Cut','Crew Cut','Undercut','Medium Loose','Medium Styled','Slicked Back','Long Straight','Long Wavy','Long Curly','Ponytail','High Ponytail','Bun','Messy Bun','Braided','Side Braid','Box Braids','Bold / Asymmetric Cut','Classic Hollywood Waves','Shag Cut'],
+  hairColors: ['Black','Dark Brown','Medium Brown','Light Brown','Dirty Blonde','Golden Blonde','Platinum Blonde','Auburn','Red','Dark Red','Copper','Silver / Grey','White','Highlighted','Ombre Dark-to-Light','Ombre Light-to-Dark','Colorful / Dyed','Streaked'],
+  hairTextures: ['Fine & Straight','Thick & Straight','Fine & Wavy','Thick & Wavy','Loose Curly','Tight Curly','Coily / Kinky','Wispy','Thick & Voluminous','Silky Smooth'],
+  hairPositions: ['Natural Fall','Swept to One Side','Tousled / Disheveled','Half Up Half Down','Pinned Back Loosely','Flowing Behind','Falling Forward Over Shoulders','Parted Down the Middle','Side Part','Covers One Eye','Falls Over Face','Pulled Back Tightly','Tucked Behind Ear','Wind-Blown','Wet / Slicked Back'],
+  occupations: ['Artist','Athlete','Barista','Businessperson','Chef','Doctor','Engineer','Lawyer','Mechanic','Model','Musician','Nurse','Photographer','Teacher','Traveler','Writer'],
+  occupationPrefills: {
+    'Artist': {style:'Eclectic', top:'Oversized T-shirt', bottom:'Jeans', outer:'Paint-splattered Jacket', footwear:'Sneakers'},
+    'Athlete': {style:'Athletic', top:'Tank Top', bottom:'Athletic Shorts', outer:null, footwear:'Athletic Shoes'},
+    'Barista': {style:'Casual', top:'Button-up Shirt', bottom:'Jeans', outer:'Apron', footwear:'Sneakers'},
+    'Businessperson': {style:'Formal', top:'Button-up Shirt', bottom:'Slacks / Trousers', outer:'Blazer', footwear:'Loafers'},
+    'Chef': {style:'Classic', top:'Chef Coat', bottom:'Slacks / Trousers', outer:null, footwear:'Clogs'},
+    'Doctor': {style:'Clean / Minimal', top:'Button-up Shirt', bottom:'Slacks / Trousers', outer:'White Coat', footwear:'Loafers'},
+    'Engineer': {style:'Casual', top:'Flannel', bottom:'Jeans', outer:null, footwear:'Boots'},
+    'Lawyer': {style:'Formal', top:'Button-up Shirt', bottom:'Slacks / Trousers', outer:'Blazer', footwear:'Oxford Shoes'},
+    'Mechanic': {style:'Rugged', top:'Henley', bottom:'Cargo Pants', outer:'Work Jacket', footwear:'Boots'},
+    'Model': {style:'Eclectic', top:'Crop Top', bottom:'Jeans', outer:'Trench Coat', footwear:'Heels'},
+    'Musician': {style:'Streetwear', top:'Graphic Tee', bottom:'Jeans', outer:'Leather Jacket', footwear:'Boots'},
+    'Nurse': {style:'Clean / Minimal', top:'Scrub Top', bottom:'Scrub Pants', outer:null, footwear:'Athletic Shoes'},
+    'Photographer': {style:'Casual', top:'T-shirt', bottom:'Cargo Pants', outer:'Vest / Utility Jacket', footwear:'Sneakers'},
+    'Teacher': {style:'Classic', top:'Button-up Shirt', bottom:'Slacks / Trousers', outer:'Cardigan', footwear:'Loafers'},
+    'Traveler': {style:'Casual', top:'Henley', bottom:'Cargo Pants', outer:'Utility Jacket', footwear:'Boots'},
+    'Writer': {style:'Casual', top:'Sweater', bottom:'Jeans', outer:null, footwear:'Loafers'},
+  },
+  outfitStyles: ['Casual','Formal','Athletic','Streetwear','Vintage','Eclectic','Dark','Classic','Contemporary','Rugged','Bohemian','Preppy','Minimalist','Glam'],
+  tops: ['T-shirt','Graphic Tee','Button-up Shirt','Flannel','Tank Top','Crop Top','Bodysuit','Sweater','Turtleneck','Henley','Polo','Blouse','Corset','Tube Top','Hoodie','Sports Bra','Off-shoulder Top'],
+  topFits: ['Oversized','Relaxed','Regular','Fitted','Cropped','Tucked In','Unbuttoned / Open'],
+  bottoms: ['Jeans','Shorts','Cargo Pants','Sweatpants','Leggings','Skirt','Mini Skirt','Maxi Skirt','Slacks / Trousers','Dress','Mini Dress','Maxi Dress','Biker Shorts','Wide-Leg Pants','Joggers','Overalls'],
+  bottomFits: ['Skinny / Tight','Slim','Straight','Loose / Baggy','Distressed','High-Waisted','Low-Rise','Cropped'],
+  outerwear: ['Leather Jacket','Denim Jacket','Blazer (Open)','Trench Coat','Bomber Jacket','Hoodie (Open)','Oversized Coat','Puffer Jacket','Cardigan','Utility Jacket / Vest','Fur-lined Jacket','Track Jacket'],
+  palettes: [
+    {id:'dark-moody', label:'Dark & Moody', colors:['#1a1a1a','#2d1b2e','#3d2b1f']},
+    {id:'earth', label:'Earth Tones', colors:['#8b6914','#5c4033','#4a5240']},
+    {id:'neutral', label:'Neutral / Minimal', colors:['#c8c0b8','#a09888','#706860']},
+    {id:'vibrant', label:'Bright & Vibrant', colors:['#e84040','#4080e0','#40c040']},
+    {id:'pastel', label:'Soft Pastels', colors:['#f0b8c8','#b8d0f0','#c8f0b8']},
+    {id:'monochrome', label:'Black & White', colors:['#000000','#808080','#ffffff']},
+    {id:'warm', label:'Warm Tones', colors:['#c84820','#e8a020','#f0d080']},
+    {id:'cool', label:'Cool Tones', colors:['#2040a0','#4080c0','#80c0e0']},
+    {id:'jewel', label:'Deep Jewel Tones', colors:['#4a0a6a','#0a3a6a','#0a4a2a']},
+    {id:'military', label:'Military / Olive', colors:['#4a5238','#6a6040','#8a7a50']},
+    {id:'pop', label:'Bold Color Pop', colors:['#e82060','#e8a000','#0080e8']},
+    {id:'denim', label:'Denim & Indigo', colors:['#2a3a6a','#3a5080','#6a80b0']},
+  ],
+  footwear: ['Sneakers','High-top Sneakers','Running Shoes','Boots','Combat Boots','Chelsea Boots','Heels','Stilettos','Block Heels','Platform Shoes','Sandals','Slides','Loafers','Oxford Shoes','Mules','Clogs','Barefoot'],
+  accessories: ['Sunglasses','Watch','Necklace','Layered Necklaces','Hat / Cap','Beanie','Headband','Scarf','Shoulder Bag','Backpack','Earrings','Hoop Earrings','Rings','Bracelet','Chain Bracelet','Belt','Gloves'],
+  outdoorLocs: [
+    'City Street','Alley','Sidewalk','Rooftop','Fire Escape','Parking Lot','Underpass','Bridge','Train Platform','Bus Stop','Intersection','Convenience Store Exterior','Storefront','Courtyard','Plaza','Fountain','Stairwell Exterior','Loading Dock','Warehouse Exterior','Industrial Zone','Port / Harbor','Shipyard','Construction Site','Graffiti Wall','Skate Park','Basketball Court','Swimming Pool','Backyard','Porch','Driveway','Suburb Street',
+    'Park','Botanical Garden','Zen Garden','Cemetery','Playground','Farmers Market','Outdoor Concert Venue','Festival Grounds','Campsite','Bonfire','Dock / Pier','Beach','Beachfront','Boardwalk','Cliffside','Rocky Shore','Waterfall','River Bank','Lake Shore','Swamp / Marsh','Desert','Sand Dunes','Canyon','Cave Entrance','Forest Path','Dense Jungle','Bamboo Grove','Meadow / Open Field','Wheat Field','Vineyard','Farm','Barn Exterior','Mountain Trail','Mountain Peak','Snowy Landscape','Glacier / Tundra','Golf Course','Tennis Court','Football Field','Track',
+  ],
+  indoorLocs: [
+    'Living Room','Bedroom','Kitchen','Bathroom','Hallway','Staircase Interior','Basement','Attic','Home Office','Walk-in Closet','Laundry Room','Garage Interior','Sunroom','Dining Room','Study / Library','Wine Cellar',
+    'Art Studio','Recording Studio','Dance Studio','Photography Studio','Yoga Studio','Gym','Boxing Gym','Locker Room','Office','Conference Room','Laboratory','Mechanic Shop','Tattoo Parlor','Barbershop','Salon / Spa','Dressing Room',
+    'Pool Hall','Bowling Alley','Arcade','Casino Floor','Nightclub','Bar','Dive Bar','Speakeasy','Rooftop Bar','Concert Hall','Theater Stage','Cinema','Museum Hall','Art Gallery',
+    'Hotel Lobby','Hotel Room','Hotel Hallway','Penthouse Interior','Elevator','Rooftop Restaurant','Elegant Restaurant','Coffee Shop','Diner','Sushi Bar','Food Court','Hotel Bar',
+    'Boutique','Record Store','Bookstore','Convenience Store Interior','Supermarket Aisle','Mall Interior','Church / Cathedral','Train Car Interior','Subway Car','Airplane Cabin','Classroom','Lecture Hall',
+  ],
+  times: ['Dawn','Early Morning','Morning','Midday','Afternoon','Golden Hour','Dusk','Blue Hour','Night','Deep Night','Midnight'],
+  weather: ['Clear','Partly Cloudy','Overcast','Light Rain','Heavy Rain','Stormy','Misty / Foggy','Snow','After Rain — wet streets','Heat Haze','Windy'],
+  seasons: ['Spring','Summer','Autumn','Winter'],
+  lighting: ['Golden Hour Sunlight','Blue Hour Glow','Soft Natural Light','Dramatic Side Light','Studio Soft Box','Neon Glow','Warm Tungsten','Harsh Direct Sun','Backlit / Rim Light','Overcast Diffused','Candlelight','High Contrast','Soft Dramatic','Dappled Light','God Rays','Streetlight'],
+  vibes: ['Peaceful','Vibrant','Busy & Crowded','Desolate / Empty','Colorful & Lively','Moody & Dark','Cinematic','Gritty','Romantic','Eerie','Nostalgic','Futuristic'],
+  shots: ['Close-up','Medium Close-up','Portrait','Half Body','3/4 Body','Full Body','Environmental Portrait','Full Body Distant','Wide Shot','Aerial'],
+  films: ['Modern Digital — Clean','Modern Digital — Cinematic','35mm Film','Medium Format Film','Polaroid','Disposable Camera','1990s Film','1980s Film','1970s Film','Black & White Film','Infrared Film'],
+  ratios: ['1:1 Square','4:5 Portrait','9:16 Vertical','3:2 Standard','16:9 Widescreen','21:9 Cinematic'],
+  dofs: ['Very Shallow (Bokeh)','Shallow','Medium','Deep','Fully Sharp'],
+};
+
+// ── STATE ─────────────────────────────────────────────────
+const state = {
+  archetypes: [],
+  gender: null,
+  ageRange: null, ageYear: null,
+  ethnicity: null,
+  bodyType: null,
+  attractiveness: null,
+  poseFacing: null, poseBody: null, poseArms: null, poseHead: null,
+  hairStyle: null, hairColor: null, hairTexture: null, hairPos: null,
+  occupation: null,
+  outfitStyle: null, top: null, topFit: null, bottom: null, bottomFit: null,
+  outer: null, palette: null, footwear: null, accessories: [],
+  mannequin: false,
+  envType: null, envLocation: null,
+  envTime: null, envWeather: null, envSeason: null, lighting: [], envVibe: null,
+  shot: null, film: null, ratio: null, dof: null,
+};
+
+// ── RENDER BUTTONS ────────────────────────────────────────
+function renderBtn(containerId, options, stateKey, multi) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  options.forEach(opt => {
+    const val = typeof opt === 'object' ? opt.id : opt;
+    const label = typeof opt === 'object' ? opt.label : opt;
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = label;
+    const isActive = multi ? state[stateKey].includes(val) : state[stateKey] === val;
+    if (isActive) b.classList.add('active');
+    b.onclick = () => {
+      if (multi) {
+        if (state[stateKey].includes(val)) state[stateKey] = state[stateKey].filter(v => v !== val);
+        else state[stateKey].push(val);
+      } else {
+        state[stateKey] = state[stateKey] === val ? null : val;
+      }
+      renderBtn(containerId, options, stateKey, multi);
+    };
+    el.appendChild(b);
+  });
+}
+
+function renderArchetypes() {
+  const el = document.getElementById('archetype-group');
+  el.innerHTML = '';
+  DATA.archetypes.forEach(a => {
+    const b = document.createElement('button');
+    b.className = 'btn pill archetype';
+    b.textContent = a.label;
+    if (state.archetypes.includes(a.id)) {
+      b.classList.add('active');
+      b.style.background = a.color;
+      b.style.borderColor = a.color;
+    }
+    b.onclick = () => {
+      if (state.archetypes.includes(a.id)) state.archetypes = state.archetypes.filter(x => x !== a.id);
+      else state.archetypes.push(a.id);
+      renderArchetypes();
+    };
+    el.appendChild(b);
+  });
+}
+
+function renderPalette() {
+  const el = document.getElementById('palette-group');
+  el.innerHTML = '';
+  DATA.palettes.forEach(p => {
+    const b = document.createElement('button');
+    b.className = 'palette-pill' + (state.palette === p.id ? ' active' : '');
+    const swatchHtml = p.colors.map(c => `<span class="palette-swatch" style="background:linear-gradient(to right,${p.colors.join(',')})"></span>`)[0];
+    b.innerHTML = swatchHtml + p.label;
+    b.onclick = () => { state.palette = state.palette === p.id ? null : p.id; renderPalette(); };
+    el.appendChild(b);
+  });
+}
+
+function renderEnvLocations() {
+  const locs = state.envType === 'outdoor' ? DATA.outdoorLocs : state.envType === 'indoor' ? DATA.indoorLocs : [];
+  const el = document.getElementById('env-location-group');
+  el.innerHTML = '';
+  document.getElementById('env-location-field').style.display = locs.length ? 'block' : 'none';
+  locs.forEach(loc => {
+    const b = document.createElement('button');
+    b.className = 'btn' + (state.envLocation === loc ? ' active' : '');
+    b.textContent = loc;
+    b.onclick = () => { state.envLocation = state.envLocation === loc ? null : loc; renderEnvLocations(); };
+    el.appendChild(b);
+  });
+}
+
+function renderAgeYears() {
+  const sel = document.getElementById('age-year-select');
+  if (!state.ageRange) { sel.classList.add('hidden'); return; }
+  sel.classList.remove('hidden');
+  sel.innerHTML = '<option value="">Specific age...</option>';
+  DATA.ageYears[state.ageRange].forEach(y => {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    if (state.ageYear == y) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+
+// ── ENV TYPE ──────────────────────────────────────────────
+function setEnvType(type) {
+  state.envType = state.envType === type ? null : type;
+  state.envLocation = null;
+  document.getElementById('env-outdoor-btn').classList.toggle('active', state.envType === 'outdoor');
+  document.getElementById('env-indoor-btn').classList.toggle('active', state.envType === 'indoor');
+  renderEnvLocations();
+}
+
+// ── MANNEQUIN ─────────────────────────────────────────────
+function toggleMannequin() {
+  state.mannequin = !state.mannequin;
+  document.getElementById('mannequin-btn').classList.toggle('active', state.mannequin);
+}
+
+// ── OCCUPATION PREFILL ────────────────────────────────────
+function handleOccupation(occ) {
+  state.occupation = state.occupation === occ ? null : occ;
+  renderBtn('occupation-group', DATA.occupations, 'occupation', false);
+  const note = document.getElementById('prefill-note');
+  if (state.occupation && DATA.occupationPrefills[state.occupation]) {
+    const p = DATA.occupationPrefills[state.occupation];
+    state.outfitStyle = p.style || state.outfitStyle;
+    state.top = p.top || state.top;
+    state.bottom = p.bottom || state.bottom;
+    state.outer = p.outer || state.outer;
+    state.footwear = p.footwear || state.footwear;
+    note.textContent = `Pre-filled: ${[p.style,p.top,p.bottom,p.outer,p.footwear].filter(Boolean).join(', ')}`;
+    note.classList.add('visible');
+    renderAll();
+  } else {
+    note.classList.remove('visible');
+  }
+}
+
+// ── INIT ALL ──────────────────────────────────────────────
+function renderAll() {
+  renderArchetypes();
+  renderBtn('gender-group', DATA.genders, 'gender', false);
+  renderBtn('age-range-group', DATA.ageRanges, 'ageRange', false);
+  renderAgeYears();
+  renderBtn('body-group', DATA.bodyTypes, 'bodyType', false);
+  renderBtn('pose-facing-group', DATA.poseFacing, 'poseFacing', false);
+  renderBtn('pose-body-group', DATA.poseBody, 'poseBody', false);
+  renderBtn('pose-arms-group', DATA.poseArms, 'poseArms', false);
+  renderBtn('pose-head-group', DATA.poseHead, 'poseHead', false);
+  renderBtn('hair-style-group', DATA.hairStyles, 'hairStyle', false);
+  renderBtn('hair-color-group', DATA.hairColors, 'hairColor', false);
+  renderBtn('hair-texture-group', DATA.hairTextures, 'hairTexture', false);
+  renderBtn('hair-pos-group', DATA.hairPositions, 'hairPos', false);
+
+  // Occupation with special handler
+  const occEl = document.getElementById('occupation-group');
+  occEl.innerHTML = '';
+  DATA.occupations.forEach(o => {
+    const b = document.createElement('button');
+    b.className = 'btn' + (state.occupation === o ? ' active' : '');
+    b.textContent = o;
+    b.onclick = () => handleOccupation(o);
+    occEl.appendChild(b);
+  });
+
+  renderBtn('style-group', DATA.outfitStyles, 'outfitStyle', false);
+  renderBtn('top-group', DATA.tops, 'top', false);
+  renderBtn('top-fit-group', DATA.topFits, 'topFit', false);
+  renderBtn('bottom-group', DATA.bottoms, 'bottom', false);
+  renderBtn('bottom-fit-group', DATA.bottomFits, 'bottomFit', false);
+  renderBtn('outer-group', DATA.outerwear, 'outer', false);
+  renderPalette();
+  renderBtn('footwear-group', DATA.footwear, 'footwear', false);
+  renderBtn('accessories-group', DATA.accessories, 'accessories', true);
+  renderEnvLocations();
+  renderBtn('env-time-group', DATA.times, 'envTime', false);
+  renderBtn('env-weather-group', DATA.weather, 'envWeather', false);
+  renderBtn('env-season-group', DATA.seasons, 'envSeason', false);
+  renderBtn('env-lighting-group', DATA.lighting, 'lighting', true);
+  renderBtn('env-vibe-group', DATA.vibes, 'envVibe', false);
+  renderBtn('shot-group', DATA.shots, 'shot', false);
+  renderBtn('film-group', DATA.films, 'film', false);
+  renderBtn('ratio-group', DATA.ratios, 'ratio', false);
+  renderBtn('dof-group', DATA.dofs, 'dof', false);
+}
+
+document.getElementById('age-range-group').addEventListener('click', () => { setTimeout(renderAgeYears, 10); });
+document.getElementById('age-year-select').addEventListener('change', e => { state.ageYear = e.target.value || null; });
+document.getElementById('ethnicity-select').innerHTML = '<option value="">Select ethnicity...</option>' + DATA.ethnicities.map(e => `<option value="${e}">${e}</option>`).join('');
+document.getElementById('ethnicity-select').addEventListener('change', e => { state.ethnicity = e.target.value || null; });
+document.getElementById('attract-select').innerHTML = '<option value="">Select level...</option>' + DATA.attractiveness.map(a => `<option value="${a}">${a}</option>`).join('');
+document.getElementById('attract-select').addEventListener('change', e => { state.attractiveness = e.target.value || null; });
+
+// ── PROMPT BUILDERS ───────────────────────────────────────
+function getMoodStr() {
+  if (!state.archetypes.length) return null;
+  const moods = state.archetypes.map(a => DATA.archetypeMoods[a]).filter(Boolean);
+  return moods.join(' and ');
+}
+
+function buildIndividualPrompt() {
+  const parts = [];
+
+  // Person
+  const ageStr = state.ageYear ? `${state.ageYear}-year-old` : state.ageRange ? `${state.ageRange.toLowerCase()}s` : null;
+  const personParts = [ageStr, state.ethnicity?.toLowerCase(), state.bodyType?.toLowerCase(), state.attractiveness?.toLowerCase()].filter(Boolean);
+  const genderStr = state.gender?.toLowerCase() || 'person';
+  let person = personParts.length ? `A ${personParts.join(', ')} ${genderStr}` : `A ${genderStr}`;
+
+  const mood = getMoodStr();
+  if (mood) person += `, ${mood}`;
+
+  // Hair
+  if (!state.mannequin) {
+    const hairParts = [state.hairColor, state.hairTexture, state.hairStyle].filter(Boolean).map(v => v.toLowerCase());
+    if (state.hairPos) hairParts.push(state.hairPos.toLowerCase());
+    if (hairParts.length) person += `, with ${hairParts.join(', ')} hair`;
+  }
+
+  parts.push(person + '.');
+
+  // Pose
+  if (!state.mannequin) {
+    const poseParts = [state.poseFacing, state.poseBody, state.poseArms, state.poseHead].filter(Boolean).map(v => v.toLowerCase());
+    if (poseParts.length) parts.push(`Pose: ${poseParts.join(', ')}.`);
+  }
+
+  // Outfit
+  if (state.mannequin) {
+    parts.push('The figure is rendered as a smooth, featureless mannequin from the neck down with no clothing. The face is hyperdetailed and photorealistic — every pore, expression, and feature rendered with extreme clarity.');
+  } else {
+    const outfitParts = [];
+    if (state.occupation) outfitParts.push(`${state.occupation.toLowerCase()}'s`);
+    if (state.outfitStyle) outfitParts.push(state.outfitStyle.toLowerCase() + ' style');
+    if (state.topFit && state.top) outfitParts.push(`${state.topFit.toLowerCase()} ${state.top.toLowerCase()}`);
+    else if (state.top) outfitParts.push(state.top.toLowerCase());
+    if (state.bottomFit && state.bottom) outfitParts.push(`${state.bottomFit.toLowerCase()} ${state.bottom.toLowerCase()}`);
+    else if (state.bottom) outfitParts.push(state.bottom.toLowerCase());
+    if (state.outer) outfitParts.push(state.outer.toLowerCase());
+    if (state.footwear) outfitParts.push(state.footwear.toLowerCase());
+    const palObj = DATA.palettes.find(p => p.id === state.palette);
+    if (palObj) outfitParts.push(`${palObj.label.toLowerCase()} color palette`);
+    if (state.accessories.length) outfitParts.push(state.accessories.join(', ').toLowerCase());
+    if (outfitParts.length) parts.push(`Wearing ${outfitParts.join(', ')}.`);
+  }
+
+  // Environment
+  const envParts = [state.envLocation, state.envTime, state.envWeather, state.envSeason, state.envVibe ? `${state.envVibe.toLowerCase()} atmosphere` : null].filter(Boolean).map(v => v.toLowerCase());
+  if (envParts.length) parts.push(`Set in ${envParts.join(', ')}.`);
+
+  // Lighting
+  if (state.lighting.length) parts.push(`Lighting: ${state.lighting.join(', ').toLowerCase()}.`);
+
+  // Camera
+  const camParts = [];
+  if (state.shot) camParts.push(state.shot.toLowerCase());
+  if (state.film) camParts.push(state.film.toLowerCase());
+  if (state.dof) camParts.push(`${state.dof.toLowerCase()} depth of field`);
+  if (state.ratio) camParts.push(`${state.ratio.toLowerCase()} aspect ratio`);
+  if (camParts.length) parts.push(`Shot: ${camParts.join(', ')}.`);
+
+  if (state.shot === 'Full Body' || state.shot === 'Full Body Distant') {
+    parts.push('The full body is visible from head to toe — feet must remain completely in frame, do not crop.');
+  }
+
+  parts.push('Highly detailed, photorealistic, cinematic quality. No text, words, letters, or writing anywhere in the image.');
+
+  return parts.join(' ');
+}
+
+function buildEnvironmentPrompt() {
+  const parts = [];
+
+  const envParts = [state.envLocation, state.envTime, state.envWeather, state.envSeason, state.envVibe ? `${state.envVibe.toLowerCase()} atmosphere` : null].filter(Boolean).map(v => v.toLowerCase());
+  if (envParts.length) parts.push(`A ${envParts.join(', ')} scene.`);
+  else parts.push('An atmospheric environment scene.');
+
+  if (state.lighting.length) parts.push(`Lighting: ${state.lighting.join(', ').toLowerCase()}.`);
+
+  const camParts = [];
+  if (state.film) camParts.push(state.film.toLowerCase());
+  if (state.ratio) camParts.push(`${state.ratio.toLowerCase()} aspect ratio`);
+  if (camParts.length) parts.push(`Shot: ${camParts.join(', ')}.`);
+
+  parts.push('No people, no figures, no humans. Ultra detailed environment, atmospheric depth, award winning photography. Highly detailed, photorealistic. No text, words, letters, or writing anywhere in the image.');
+
+  return parts.join(' ');
+}
+
+// ── GENERATE ──────────────────────────────────────────────
+function displayPrompt(text) {
+  const el = document.getElementById('output-text');
+  el.classList.remove('empty');
+  el.innerHTML = text + '<span class="output-cursor"></span>';
+}
+
+function generateIndividual() {
+  const prompt = buildIndividualPrompt();
+  displayPrompt(prompt);
+  window._lastPrompt = prompt;
+}
+
+function generateEnvironment() {
+  const prompt = buildEnvironmentPrompt();
+  displayPrompt(prompt);
+  window._lastPrompt = prompt;
+}
+
+// ── COPY ──────────────────────────────────────────────────
+async function copyPrompt() {
+  const text = window._lastPrompt;
+  if (!text) return;
+  const btn = document.querySelector('.copy-btn');
+  let ok = false;
+  if (navigator.clipboard && window.isSecureContext) {
+    try { await navigator.clipboard.writeText(text); ok = true; } catch {}
+  }
+  if (!ok) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    try { ok = document.execCommand('copy'); } catch {}
+    document.body.removeChild(ta);
+  }
+  btn.textContent = ok ? '[ COPIED! ]' : '[ COPY FAILED ]';
+  btn.classList.toggle('copied', ok);
+  setTimeout(() => { btn.textContent = '[ COPY ]'; btn.classList.remove('copied'); }, 2500);
+}
+
+// ── SAVE / LOAD ───────────────────────────────────────────
+function savePrompt() {
+  const text = window._lastPrompt;
+  if (!text) return;
+  const name = document.getElementById('save-name-input').value.trim() || `Prompt ${new Date().toLocaleTimeString()}`;
+  const saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
+  saved.unshift({ id: Date.now(), name, prompt: text, state: JSON.stringify(state) });
+  localStorage.setItem('ipb-saved', JSON.stringify(saved));
+  document.getElementById('save-name-input').value = '';
+  renderSaved();
+  updateSavedCount();
+}
+
+function renderSaved() {
+  const saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
+  const el = document.getElementById('saved-list');
+  if (!saved.length) { el.innerHTML = '<span style="color:var(--muted);font-size:13px;">No saved prompts yet.</span>'; return; }
+  el.innerHTML = saved.map(p => `
+    <div class="saved-item">
+      <div class="saved-item-name">${p.name}</div>
+      <div class="saved-item-preview">${p.prompt}</div>
+      <div class="saved-item-actions">
+        <button class="load-btn" onclick="loadPrompt(${p.id})">Load</button>
+        <button class="del-btn" onclick="deletePrompt(${p.id})">×</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadPrompt(id) {
+  const saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
+  const entry = saved.find(p => p.id === id);
+  if (!entry) return;
+  if (entry.state) {
+    const s = JSON.parse(entry.state);
+    Object.assign(state, s);
+  }
+  displayPrompt(entry.prompt);
+  window._lastPrompt = entry.prompt;
+  renderAll();
+  document.getElementById('saved-panel').classList.remove('open');
+}
+
+function deletePrompt(id) {
+  let saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
+  saved = saved.filter(p => p.id !== id);
+  localStorage.setItem('ipb-saved', JSON.stringify(saved));
+  renderSaved();
+  updateSavedCount();
+}
+
+function updateSavedCount() {
+  const saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
+  document.getElementById('saved-count').textContent = saved.length;
+}
+
+function toggleSaved() {
+  const panel = document.getElementById('saved-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) renderSaved();
+}
+
+// ── RANDOMIZE ─────────────────────────────────────────────
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function maybe(arr, chance) { return Math.random() < (chance || 0.7) ? pick(arr) : null; }
+
+const SCENARIOS = [
+  { envType:'outdoor', location:'City Street', time:'Night', weather:'After Rain — wet streets', lighting:['Neon Glow','Warm Tungsten'] },
+  { envType:'outdoor', location:'Beach', time:'Golden Hour', weather:'Clear', lighting:['Golden Hour Sunlight','Soft Natural Light'] },
+  { envType:'outdoor', location:'Forest Path', time:'Morning', weather:'Misty / Foggy', lighting:['Dappled Light','God Rays'] },
+  { envType:'indoor', location:'Coffee Shop', time:'Morning', weather:null, lighting:['Warm Tungsten','Soft Natural Light'] },
+  { envType:'outdoor', location:'Rooftop', time:'Blue Hour', weather:'Clear', lighting:['Blue Hour Glow','Neon Glow'] },
+  { envType:'indoor', location:'Nightclub', time:'Night', weather:null, lighting:['Neon Glow','High Contrast'] },
+  { envType:'outdoor', location:'Mountain Trail', time:'Golden Hour', weather:'Partly Cloudy', lighting:['Golden Hour Sunlight','Dramatic Side Light'] },
+  { envType:'indoor', location:'Art Studio', time:'Afternoon', weather:null, lighting:['Soft Natural Light','Soft Dramatic'] },
+  { envType:'outdoor', location:'Boardwalk', time:'Dusk', weather:'Partly Cloudy', lighting:['Golden Hour Sunlight','Soft Dramatic'] },
+  { envType:'indoor', location:'Bar', time:'Night', weather:null, lighting:['Warm Tungsten','Candlelight'] },
+];
+
+function randomize() {
+  const sc = pick(SCENARIOS);
+  state.archetypes = [pick(DATA.archetypes).id];
+  state.gender = pick(DATA.genders);
+  state.ageRange = pick(['20s','30s','40s']);
+  state.ageYear = maybe([21,24,27,29,31,34,36,38,42,45].map(String));
+  state.ethnicity = maybe(DATA.ethnicities);
+  state.bodyType = pick(DATA.bodyTypes);
+  state.attractiveness = maybe(DATA.attractiveness);
+  state.poseFacing = maybe(DATA.poseFacing);
+  state.poseBody = maybe(DATA.poseBody);
+  state.poseArms = maybe(DATA.poseArms, 0.5);
+  state.poseHead = maybe(DATA.poseHead, 0.5);
+  state.hairStyle = pick(DATA.hairStyles);
+  state.hairColor = pick(DATA.hairColors);
+  state.hairTexture = maybe(DATA.hairTextures);
+  state.hairPos = maybe(DATA.hairPositions, 0.5);
+  state.occupation = null;
+  state.outfitStyle = pick(DATA.outfitStyles);
+  state.top = pick(DATA.tops);
+  state.topFit = maybe(DATA.topFits);
+  state.bottom = pick(DATA.bottoms);
+  state.bottomFit = maybe(DATA.bottomFits);
+  state.outer = maybe(DATA.outerwear, 0.5);
+  state.palette = maybe(DATA.palettes.map(p => p.id));
+  state.footwear = pick(DATA.footwear);
+  state.accessories = [];
+  state.mannequin = false;
+  state.envType = sc.envType;
+  state.envLocation = sc.location;
+  state.envTime = sc.time;
+  state.envWeather = sc.weather;
+  state.envSeason = maybe(DATA.seasons, 0.5);
+  state.lighting = sc.lighting;
+  state.envVibe = maybe(DATA.vibes, 0.5);
+  state.shot = pick(['Portrait','Half Body','3/4 Body','Full Body','Environmental Portrait']);
+  state.film = maybe(DATA.films);
+  state.ratio = maybe(DATA.ratios);
+  state.dof = maybe(DATA.dofs);
+  document.getElementById('env-outdoor-btn').classList.toggle('active', state.envType === 'outdoor');
+  document.getElementById('env-indoor-btn').classList.toggle('active', state.envType === 'indoor');
+  document.getElementById('mannequin-btn').classList.remove('active');
+  document.getElementById('ethnicity-select').value = state.ethnicity || '';
+  document.getElementById('attract-select').value = state.attractiveness || '';
+  document.getElementById('prefill-note').classList.remove('visible');
+  renderAll();
+  window._lastPrompt = null;
+  document.getElementById('output-text').innerHTML = 'Awaiting generation...<span class="output-cursor"></span>';
+  document.getElementById('output-text').classList.add('empty');
+}
+
+// ── RESET ─────────────────────────────────────────────────
+function resetAll() {
+  Object.assign(state, {
+    archetypes:[], gender:null, ageRange:null, ageYear:null, ethnicity:null,
+    bodyType:null, attractiveness:null,
+    poseFacing:null, poseBody:null, poseArms:null, poseHead:null,
+    hairStyle:null, hairColor:null, hairTexture:null, hairPos:null,
+    occupation:null, outfitStyle:null, top:null, topFit:null, bottom:null, bottomFit:null,
+    outer:null, palette:null, footwear:null, accessories:[], mannequin:false,
+    envType:null, envLocation:null, envTime:null, envWeather:null, envSeason:null, lighting:[], envVibe:null,
+    shot:null, film:null, ratio:null, dof:null,
+  });
+  document.getElementById('env-outdoor-btn').classList.remove('active');
+  document.getElementById('env-indoor-btn').classList.remove('active');
+  document.getElementById('env-location-field').style.display = 'none';
+  document.getElementById('mannequin-btn').classList.remove('active');
+  document.getElementById('ethnicity-select').value = '';
+  document.getElementById('attract-select').value = '';
+  document.getElementById('age-year-select').classList.add('hidden');
+  document.getElementById('prefill-note').classList.remove('visible');
+  window._lastPrompt = null;
+  document.getElementById('output-text').innerHTML = 'Awaiting generation...<span class="output-cursor"></span>';
+  document.getElementById('output-text').classList.add('empty');
+  renderAll();
+}
+
+// ── INIT ──────────────────────────────────────────────────
+renderAll();
+updateSavedCount();
+document.getElementById('env-location-field').style.display = 'none';
+</script>
+</body>
+</html>
