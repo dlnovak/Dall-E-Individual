@@ -13,66 +13,77 @@
   --accent:#5b6af0; --accent2:#8b9af8;
   --text:#e8e4f0; --muted:#6a6480; --border:#252535;
   --btn-active-text:#ffffff;
+  --terminal:#00ff41; --terminal-dim:#003a0f; --terminal-mid:#00aa28; --terminal-bg:#000;
 }
 body.theme-charcoal {
   --bg:#111; --surface:#1a1a1a; --surface2:#222;
   --accent:#d0d0d0; --accent2:#f0f0f0;
   --text:#f0f0f0; --muted:#888; --border:#333;
   --btn-active-text:#111;
+  --terminal:#e0e0e0; --terminal-dim:#444; --terminal-mid:#aaa; --terminal-bg:#0a0a0a;
 }
 body.theme-blackout {
   --bg:#000; --surface:#0f0f0f; --surface2:#161616;
   --accent:#e8b84b; --accent2:#f0cc72;
   --text:#f0ece4; --muted:#6a6050; --border:#1f1f1f;
   --btn-active-text:#000;
+  --terminal:#f0cc72; --terminal-dim:#3a2a00; --terminal-mid:#b08820; --terminal-bg:#080400;
 }
 body.theme-rust {
   --bg:#1a0e08; --surface:#241410; --surface2:#2e1c14;
   --accent:#c4552a; --accent2:#e07050;
   --text:#f0e0d0; --muted:#8a6050; --border:#3a2418;
   --btn-active-text:#fff;
+  --terminal:#ff9060; --terminal-dim:#3a1a08; --terminal-mid:#c06030; --terminal-bg:#0a0400;
 }
 body.theme-forest {
   --bg:#080f08; --surface:#0f160f; --surface2:#161e16;
   --accent:#4a7a42; --accent2:#70a868;
   --text:#d8e8d0; --muted:#5a7050; --border:#1e2a1e;
   --btn-active-text:#fff;
+  --terminal:#80ff80; --terminal-dim:#0a2a0a; --terminal-mid:#40a840; --terminal-bg:#010801;
 }
 body.theme-sand {
   --bg:#1a1610; --surface:#241e14; --surface2:#2e261a;
   --accent:#c4a45a; --accent2:#e0c080;
   --text:#f0e8d0; --muted:#8a7850; --border:#3a3020;
   --btn-active-text:#1a1610;
+  --terminal:#e8d080; --terminal-dim:#3a2a08; --terminal-mid:#b09030; --terminal-bg:#080600;
 }
 body.theme-slate {
   --bg:#0a0e12; --surface:#121620; --surface2:#1a1e2e;
   --accent:#4a7ab8; --accent2:#70a0d8;
   --text:#d0d8e8; --muted:#5a6878; --border:#202840;
   --btn-active-text:#fff;
+  --terminal:#70c8ff; --terminal-dim:#08182a; --terminal-mid:#3a80c0; --terminal-bg:#000408;
 }
 body.theme-fog {
   --bg:#f0eef4; --surface:#e8e6f0; --surface2:#dddae8;
   --accent:#7060a8; --accent2:#9080c0;
   --text:#282838; --muted:#8080a0; --border:#c8c6d8;
   --btn-active-text:#fff;
+  --terminal:#6050a0; --terminal-dim:#d0c8e8; --terminal-mid:#9080c0; --terminal-bg:#e8e6f8;
 }
 body.theme-dusk {
   --bg:#12080e; --surface:#1c1018; --surface2:#261420;
   --accent:#a060b0; --accent2:#c080d0;
   --text:#e8d0f0; --muted:#7050a0; --border:#301830;
   --btn-active-text:#fff;
+  --terminal:#d880f8; --terminal-dim:#280838; --terminal-mid:#9040b8; --terminal-bg:#060008;
 }
 body.theme-neonnoir {
   --bg:#080810; --surface:#0e0e18; --surface2:#141420;
   --accent:#00d4ff; --accent2:#60e8ff;
   --text:#e0f0ff; --muted:#405060; --border:#1a1a28;
   --btn-active-text:#080810;
+  --terminal:#00d4ff; --terminal-dim:#002838; --terminal-mid:#0090c0; --terminal-bg:#000408;
 }
 body.theme-copper {
   --bg:#100a06; --surface:#180e08; --surface2:#20120a;
   --accent:#b07840; --accent2:#d09858;
   --text:#e8d8c0; --muted:#806040; --border:#281808;
   --btn-active-text:#100a06;
+  --terminal:#d09858; --terminal-dim:#281808; --terminal-mid:#906030; --terminal-bg:#060300;
 }
 
 /* ── BASE ───────────────────────────────────────────────── */
@@ -227,50 +238,67 @@ select:focus { border-color: var(--accent); }
   font-size: 14px; color: #00aa28;
   letter-spacing: 0.1em; margin-bottom: 10px;
 }
+.output-box {
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal);
+  border-radius: 8px;
+  padding: 24px;
+  min-height: 120px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  transition: background 0.3s, border-color 0.3s;
+}
+.output-label {
+  font-family: 'VT323', monospace;
+  font-size: 14px; color: var(--terminal-mid);
+  letter-spacing: 0.1em; margin-bottom: 10px;
+}
 .output-text {
   font-family: 'VT323', monospace;
   font-size: 20px; line-height: 1.6;
-  color: #00ff41;
+  color: var(--terminal);
   word-break: break-word;
-  min-height: 60px;
+  min-height: 120px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: vertical;
+  padding: 0;
+  caret-color: var(--terminal);
+  transition: color 0.3s;
 }
-.output-text.empty { color: #003a0f; font-style: italic; }
-.output-cursor {
-  display: inline-block; width: 10px; height: 18px;
-  background: #00ff41; margin-left: 2px;
-  animation: blink 1s step-end infinite;
-  vertical-align: bottom;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.output-text::placeholder { color: var(--terminal-dim); font-style: italic; }
+.output-text.empty { color: var(--terminal-dim); }
 
 .output-actions {
   display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap;
 }
 .copy-btn {
   padding: 8px 20px; border-radius: 5px;
-  border: 1px solid #00ff41;
-  background: transparent; color: #00ff41;
+  border: 1px solid var(--terminal);
+  background: transparent; color: var(--terminal);
   font-family: 'VT323', monospace; font-size: 18px;
   cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em;
 }
-.copy-btn:hover { background: #00ff41; color: #000; }
-.copy-btn.copied { background: #00ff41; color: #000; }
+.copy-btn:hover { background: var(--terminal); color: var(--terminal-bg); }
+.copy-btn.copied { background: var(--terminal); color: var(--terminal-bg); }
 .save-input {
   padding: 7px 12px; border-radius: 5px;
-  border: 1px solid #00aa28;
-  background: #000; color: #00ff41;
+  border: 1px solid var(--terminal-mid);
+  background: var(--terminal-bg); color: var(--terminal);
   font-family: 'VT323', monospace; font-size: 16px;
   outline: none; width: 200px; letter-spacing: 0.05em;
 }
-.save-input::placeholder { color: #003a0f; }
+.save-input::placeholder { color: var(--terminal-dim); }
 .save-btn {
   padding: 8px 20px; border-radius: 5px;
-  border: 1px solid #00aa28;
-  background: transparent; color: #00aa28;
+  border: 1px solid var(--terminal-mid);
+  background: transparent; color: var(--terminal-mid);
   font-family: 'VT323', monospace; font-size: 18px;
   cursor: pointer; transition: all 0.15s;
 }
-.save-btn:hover { border-color: #00ff41; color: #00ff41; }
+.save-btn:hover { border-color: var(--terminal); color: var(--terminal); }
 
 /* ── GENERATE BUTTONS ───────────────────────────────────── */
 .generate-row {
@@ -518,6 +546,11 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; 
     </div>
 
     <div class="field">
+      <span class="field-label">Swimwear — optional, replaces top & bottom</span>
+      <div class="btn-group" id="swimwear-group"></div>
+    </div>
+
+    <div class="field">
       <span class="field-label">Mannequin Mode</span>
       <div class="btn-group">
         <button class="btn" id="mannequin-btn" onclick="toggleMannequin()">Mannequin</button>
@@ -584,6 +617,11 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; 
     </div>
 
     <div class="field">
+      <span class="field-label">Lens</span>
+      <div class="btn-group" id="lens-group"></div>
+    </div>
+
+    <div class="field">
       <span class="field-label">Aspect Ratio</span>
       <div class="btn-group" id="ratio-group"></div>
     </div>
@@ -597,14 +635,20 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; 
   <!-- ── OUTPUT ── -->
   <div class="output-section">
     <div class="output-box">
-      <div class="output-label">&gt; DALL-E PROMPT OUTPUT</div>
-      <div class="output-text empty" id="output-text">Awaiting generation...<span class="output-cursor"></span></div>
+      <div class="output-label">&gt; DALL-E PROMPT OUTPUT — <span style="font-size:12px;color:#00aa28;">editable</span></div>
+      <textarea class="output-text empty" id="output-text" placeholder="Awaiting generation..." spellcheck="false"></textarea>
     </div>
     <div class="output-actions">
       <button class="copy-btn" onclick="copyPrompt()">[ COPY ]</button>
       <input class="save-input" id="save-name-input" placeholder="Name this prompt..." />
       <button class="save-btn" onclick="savePrompt()">[ SAVE ]</button>
     </div>
+  </div>
+
+  <!-- ── WARNINGS ── -->
+  <div id="warning-box" style="display:none; margin-top:24px; padding:16px 20px; border-radius:8px; border:1px solid #c08000; background:rgba(80,40,0,0.3);">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.14em;color:#f0a020;text-transform:uppercase;margin-bottom:8px;">⚠ Contradictory Selections</div>
+    <div id="warning-list" style="font-size:13px;color:#e0b860;line-height:1.8;"></div>
   </div>
 
   <!-- ── GENERATE BUTTONS ── -->
@@ -679,6 +723,8 @@ const DATA = {
   poseArms: ['Arms at Sides','Arms Crossed','One Hand on Hip','Both Hands on Hips','Hands Clasped in Front','One Arm Raised','Hands Behind Back','Reaching Forward','One Hand on Face','Arms Behind Head'],
   poseHead: ['Direct Eye Contact','Looking Down','Looking Up','Looking Away Left','Looking Away Right','Eyes Closed','Head Tilted','Chin Down','Head Back'],
   hairStyles: ['Short & Neat','Short & Messy','Buzz Cut','Crew Cut','Undercut','Medium Loose','Medium Styled','Slicked Back','Long Straight','Long Wavy','Long Curly','Ponytail','High Ponytail','Bun','Messy Bun','Braided','Side Braid','Box Braids','Bold / Asymmetric Cut','Classic Hollywood Waves','Shag Cut'],
+  hairStylesMale: ['Buzz Cut','Crew Cut','Undercut','Side Part','Slicked Back','Textured Crop','Fade / Taper','Pompadour','Quiff','Faux Hawk','Caesar Cut','Ivy League','Short & Messy','Medium Loose','Medium Styled','Man Bun','Long & Straight','Long & Wavy','Long & Curly','Dreadlocks','Braids','Cornrows','French Crop'],
+  hairStylesFemale: ['Pixie Cut','Bob Cut','Lob (Long Bob)','Short & Neat','Short & Messy','Shag Cut','Medium Loose','Medium Styled','Long Straight','Long Wavy','Long Curly','Curtain Bangs','Blunt Bangs','Ponytail','High Ponytail','Messy Bun','Top Knot','Bun','Braided','Side Braid','Box Braids','Classic Hollywood Waves','Bold / Asymmetric Cut','Half Up Half Down','Voluminous Blowout'],
   hairColors: ['Black','Dark Brown','Medium Brown','Light Brown','Dirty Blonde','Golden Blonde','Platinum Blonde','Auburn','Red','Dark Red','Copper','Silver / Grey','White','Highlighted','Ombre Dark-to-Light','Ombre Light-to-Dark','Colorful / Dyed','Streaked'],
   hairTextures: ['Fine & Straight','Thick & Straight','Fine & Wavy','Thick & Wavy','Loose Curly','Tight Curly','Coily / Kinky','Wispy','Thick & Voluminous','Silky Smooth'],
   hairPositions: ['Natural Fall','Swept to One Side','Tousled / Disheveled','Half Up Half Down','Pinned Back Loosely','Flowing Behind','Falling Forward Over Shoulders','Parted Down the Middle','Side Part','Covers One Eye','Falls Over Face','Pulled Back Tightly','Tucked Behind Ear','Wind-Blown','Wet / Slicked Back'],
@@ -722,7 +768,17 @@ const DATA = {
     {id:'denim', label:'Denim & Indigo', colors:['#2a3a6a','#3a5080','#6a80b0']},
   ],
   footwear: ['Sneakers','High-top Sneakers','Running Shoes','Boots','Combat Boots','Chelsea Boots','Heels','Stilettos','Block Heels','Platform Shoes','Sandals','Slides','Loafers','Oxford Shoes','Mules','Clogs','Barefoot'],
-  accessories: ['Sunglasses','Watch','Necklace','Layered Necklaces','Hat / Cap','Beanie','Headband','Scarf','Shoulder Bag','Backpack','Earrings','Hoop Earrings','Rings','Bracelet','Chain Bracelet','Belt','Gloves'],
+  footwearMale: ['Sneakers','High-top Sneakers','Running Shoes','Boots','Combat Boots','Chelsea Boots','Desert Boots','Loafers','Oxford Shoes','Derby Shoes','Boat Shoes','Sandals','Slides','Flip Flops','Clogs','Dress Shoes','Barefoot'],
+  footwearFemale: ['Sneakers','High-top Sneakers','Running Shoes','Boots','Combat Boots','Chelsea Boots','Heels','Stilettos','Block Heels','Platform Shoes','Wedges','Ankle Strap Heels','Sandals','Slides','Mules','Loafers','Ballet Flats','Clogs','Barefoot'],
+  tops: ['T-shirt','Graphic Tee','Button-up Shirt','Flannel','Tank Top','Sweater','Turtleneck','Henley','Polo','Hoodie'],
+  topsMale: ['T-shirt','Graphic Tee','Muscle Tee','Button-up Shirt','Flannel','Henley','Polo','Sweater','Crewneck Sweatshirt','Hoodie','Tank Top','Compression Shirt','Rugby Shirt','Baseball Tee','Thermal / Waffle Knit','Turtleneck'],
+  topsFemale: ['T-shirt','Graphic Tee','Button-up Shirt','Flannel','Tank Top','Crop Top','Bodysuit','Sweater','Turtleneck','Blouse','Corset Top','Tube Top','Hoodie','Sports Bra','Off-shoulder Top','Wrap Top','Halter Top','Camisole'],
+  bottoms: ['Jeans','Cargo Pants','Sweatpants','Slacks / Trousers','Shorts','Joggers'],
+  bottomsMale: ['Jeans','Slim Jeans','Straight Jeans','Cargo Pants','Chinos','Dress Trousers','Sweatpants','Joggers','Athletic Shorts','Cargo Shorts','Chino Shorts','Board Shorts','Overalls','Wide-Leg Pants','Track Pants'],
+  bottomsFemale: ['Jeans','High-Rise Jeans','Mom Jeans','Cargo Pants','Sweatpants','Leggings','Mini Skirt','Midi Skirt','Maxi Skirt','Pleated Skirt','Mini Dress','Midi Dress','Maxi Dress','Biker Shorts','Wide-Leg Pants','Joggers','Overalls','Wrap Skirt'],
+  swimwear: ['Bikini','String Bikini','Bandeau Bikini','High-Waisted Bikini','One-Piece Swimsuit','Cut-Out One-Piece','Monokini','Swim Shorts','Board Shorts','Rash Guard','Wetsuit','Thong Bikini','Sports Swimsuit','Sarong Over Swimwear'],
+  swimwearMale: ['Swim Shorts','Board Shorts','Speedo / Brief','Rash Guard','Wetsuit','Swim Trunks','Compression Swim Shorts'],
+  swimwearFemale: ['Bikini','String Bikini','Bandeau Bikini','High-Waisted Bikini','One-Piece Swimsuit','Cut-Out One-Piece','Monokini','Thong Bikini','Sports Swimsuit','Rash Guard','Wetsuit','Sarong Over Swimwear'],
   outdoorLocs: [
     'City Street','Alley','Sidewalk','Rooftop','Fire Escape','Parking Lot','Underpass','Bridge','Train Platform','Bus Stop','Intersection','Convenience Store Exterior','Storefront','Courtyard','Plaza','Fountain','Stairwell Exterior','Loading Dock','Warehouse Exterior','Industrial Zone','Port / Harbor','Shipyard','Construction Site','Graffiti Wall','Skate Park','Basketball Court','Swimming Pool','Backyard','Porch','Driveway','Suburb Street',
     'Park','Botanical Garden','Zen Garden','Cemetery','Playground','Farmers Market','Outdoor Concert Venue','Festival Grounds','Campsite','Bonfire','Dock / Pier','Beach','Beachfront','Boardwalk','Cliffside','Rocky Shore','Waterfall','River Bank','Lake Shore','Swamp / Marsh','Desert','Sand Dunes','Canyon','Cave Entrance','Forest Path','Dense Jungle','Bamboo Grove','Meadow / Open Field','Wheat Field','Vineyard','Farm','Barn Exterior','Mountain Trail','Mountain Peak','Snowy Landscape','Glacier / Tundra','Golf Course','Tennis Court','Football Field','Track',
@@ -741,8 +797,10 @@ const DATA = {
   vibes: ['Peaceful','Vibrant','Busy & Crowded','Desolate / Empty','Colorful & Lively','Moody & Dark','Cinematic','Gritty','Romantic','Eerie','Nostalgic','Futuristic'],
   shots: ['Close-up','Medium Close-up','Portrait','Half Body','3/4 Body','Full Body','Environmental Portrait','Full Body Distant','Wide Shot','Aerial'],
   films: ['Modern Digital — Clean','Modern Digital — Cinematic','35mm Film','Medium Format Film','Polaroid','Disposable Camera','1990s Film','1980s Film','1970s Film','Black & White Film','Infrared Film'],
+  lenses: ['14mm Ultra-Wide','24mm Wide','35mm Street','50mm Standard','85mm Portrait','100mm Macro','135mm Telephoto','200mm Long Telephoto','400mm Super Telephoto','24-70mm Zoom','70-200mm Zoom'],
   ratios: ['1:1 Square','4:5 Portrait','9:16 Vertical','3:2 Standard','16:9 Widescreen','21:9 Cinematic'],
   dofs: ['Very Shallow (Bokeh)','Shallow','Medium','Deep','Fully Sharp'],
+  accessories: ['Sunglasses','Watch','Necklace','Layered Necklaces','Hat / Cap','Beanie','Headband','Scarf','Shoulder Bag','Backpack','Earrings','Hoop Earrings','Rings','Bracelet','Chain Bracelet','Belt','Gloves'],
 };
 
 // ── STATE ─────────────────────────────────────────────────
@@ -761,7 +819,8 @@ const state = {
   mannequin: false,
   envType: null, envLocation: null,
   envTime: null, envWeather: null, envSeason: null, lighting: [], envVibe: null,
-  shot: null, film: null, ratio: null, dof: null,
+  shot: null, film: null, lens: null, ratio: null, dof: null,
+  swimwear: null,
 };
 
 // ── RENDER BUTTONS ────────────────────────────────────────
@@ -886,9 +945,24 @@ function handleOccupation(occ) {
 }
 
 // ── INIT ALL ──────────────────────────────────────────────
+function getGenderedList(base, male, female) {
+  if (state.gender === 'Male') return male;
+  if (state.gender === 'Female') return female;
+  return base;
+}
+
 function renderAll() {
   renderArchetypes();
-  renderBtn('gender-group', DATA.genders, 'gender', false);
+  // Gender — re-renders all gendered lists on change
+  const genderEl = document.getElementById('gender-group');
+  genderEl.innerHTML = '';
+  DATA.genders.forEach(g => {
+    const b = document.createElement('button');
+    b.className = 'btn' + (state.gender === g ? ' active' : '');
+    b.textContent = g;
+    b.onclick = () => { state.gender = state.gender === g ? null : g; renderAll(); };
+    genderEl.appendChild(b);
+  });
   renderBtn('age-range-group', DATA.ageRanges, 'ageRange', false);
   renderAgeYears();
   renderBtn('body-group', DATA.bodyTypes, 'bodyType', false);
@@ -896,7 +970,7 @@ function renderAll() {
   renderBtn('pose-body-group', DATA.poseBody, 'poseBody', false);
   renderBtn('pose-arms-group', DATA.poseArms, 'poseArms', false);
   renderBtn('pose-head-group', DATA.poseHead, 'poseHead', false);
-  renderBtn('hair-style-group', DATA.hairStyles, 'hairStyle', false);
+  renderBtn('hair-style-group', getGenderedList(DATA.hairStyles, DATA.hairStylesMale, DATA.hairStylesFemale), 'hairStyle', false);
   renderBtn('hair-color-group', DATA.hairColors, 'hairColor', false);
   renderBtn('hair-texture-group', DATA.hairTextures, 'hairTexture', false);
   renderBtn('hair-pos-group', DATA.hairPositions, 'hairPos', false);
@@ -913,14 +987,15 @@ function renderAll() {
   });
 
   renderBtn('style-group', DATA.outfitStyles, 'outfitStyle', false);
-  renderBtn('top-group', DATA.tops, 'top', false);
+  renderBtn('top-group', getGenderedList(DATA.tops, DATA.topsMale, DATA.topsFemale), 'top', false);
   renderBtn('top-fit-group', DATA.topFits, 'topFit', false);
-  renderBtn('bottom-group', DATA.bottoms, 'bottom', false);
+  renderBtn('bottom-group', getGenderedList(DATA.bottoms, DATA.bottomsMale, DATA.bottomsFemale), 'bottom', false);
   renderBtn('bottom-fit-group', DATA.bottomFits, 'bottomFit', false);
   renderBtn('outer-group', DATA.outerwear, 'outer', false);
   renderPalette();
-  renderBtn('footwear-group', DATA.footwear, 'footwear', false);
+  renderBtn('footwear-group', getGenderedList(DATA.footwear, DATA.footwearMale, DATA.footwearFemale), 'footwear', false);
   renderBtn('accessories-group', DATA.accessories, 'accessories', true);
+  renderBtn('swimwear-group', getGenderedList(DATA.swimwear, DATA.swimwearMale, DATA.swimwearFemale), 'swimwear', false);
   renderEnvLocations();
   renderBtn('env-time-group', DATA.times, 'envTime', false);
   renderBtn('env-weather-group', DATA.weather, 'envWeather', false);
@@ -929,8 +1004,81 @@ function renderAll() {
   renderBtn('env-vibe-group', DATA.vibes, 'envVibe', false);
   renderBtn('shot-group', DATA.shots, 'shot', false);
   renderBtn('film-group', DATA.films, 'film', false);
+  renderBtn('lens-group', DATA.lenses, 'lens', false);
   renderBtn('ratio-group', DATA.ratios, 'ratio', false);
   renderBtn('dof-group', DATA.dofs, 'dof', false);
+}
+
+// ── CONTRADICTION CHECKER ─────────────────────────────────
+function checkContradictions() {
+  const warnings = [];
+
+  // Time of day vs lighting conflicts
+  const nightTimes = ['Night','Deep Night','Midnight'];
+  const dayLighting = ['Golden Hour Sunlight','Harsh Direct Sun','Soft Natural Light','Dappled Light','God Rays'];
+  const nightLighting = ['Neon Glow','Warm Tungsten','Candlelight','Streetlight'];
+  const goldenLighting = ['Golden Hour Sunlight'];
+
+  if (state.envTime && nightTimes.includes(state.envTime)) {
+    const conflicting = state.lighting.filter(l => dayLighting.includes(l));
+    if (conflicting.length) warnings.push(`Time "${state.envTime}" conflicts with lighting: ${conflicting.join(', ')} — these are daytime light sources.`);
+  }
+  if (state.envTime === 'Golden Hour' && state.lighting.includes('Neon Glow')) {
+    warnings.push('"Golden Hour" and "Neon Glow" conflict — neon is a nighttime lighting source.');
+  }
+  if (state.envTime === 'Midday' && state.lighting.some(l => nightLighting.includes(l))) {
+    const conflicting = state.lighting.filter(l => nightLighting.includes(l));
+    warnings.push(`Time "Midday" conflicts with lighting: ${conflicting.join(', ')} — these are nighttime/indoor light sources.`);
+  }
+
+  // Shot type vs visible clothing
+  const closeCrops = ['Close-up','Medium Close-up'];
+  const legVisible = ['Boots','Combat Boots','Chelsea Boots','Heels','Stilettos','Block Heels','Platform Shoes','Sneakers','Sandals','Barefoot','Oxford Shoes','Loafers'];
+  if (closeCrops.includes(state.shot) && state.footwear && legVisible.includes(state.footwear)) {
+    warnings.push(`Shot type "${state.shot}" shows only the face/shoulders — footwear "${state.footwear}" won't be visible.`);
+  }
+  if (closeCrops.includes(state.shot) && state.swimwear) {
+    warnings.push(`Shot type "${state.shot}" will not show swimwear — consider Half Body or Full Body.`);
+  }
+  if (closeCrops.includes(state.shot) && (state.bottom || state.bottomFit)) {
+    const item = state.bottomFit ? `${state.bottomFit} ${state.bottom}` : state.bottom;
+    if (item) warnings.push(`Shot type "${state.shot}" won't show bottom clothing "${item}".`);
+  }
+
+  // Indoor + outdoor weather
+  const outdoorWeather = ['Light Rain','Heavy Rain','Stormy','Snow','Heat Haze','Windy'];
+  if (state.envType === 'indoor' && state.envWeather && outdoorWeather.includes(state.envWeather)) {
+    warnings.push(`Indoor location with weather "${state.envWeather}" — weather only affects outdoor scenes.`);
+  }
+
+  // Season + weather conflicts
+  if (state.envSeason === 'Summer' && state.envWeather === 'Snow') {
+    warnings.push('"Summer" season conflicts with "Snow" weather.');
+  }
+  if (state.envSeason === 'Winter' && state.envWeather === 'Heat Haze') {
+    warnings.push('"Winter" season conflicts with "Heat Haze" weather.');
+  }
+
+  // Swimwear + heavy outerwear
+  const heavyOuter = ['Puffer Jacket','Oversized Coat','Trench Coat'];
+  if (state.swimwear && state.outer && heavyOuter.includes(state.outer)) {
+    warnings.push(`Swimwear with "${state.outer}" is contradictory.`);
+  }
+
+  // Multiple conflicting times
+  if (state.lighting.includes('Golden Hour Sunlight') && state.lighting.includes('Neon Glow') && state.lighting.includes('Candlelight')) {
+    warnings.push('Too many conflicting light sources selected — "Golden Hour Sunlight", "Neon Glow", and "Candlelight" together may produce inconsistent results.');
+  }
+
+  const box = document.getElementById('warning-box');
+  const list = document.getElementById('warning-list');
+  if (warnings.length) {
+    list.innerHTML = warnings.map(w => `• ${w}`).join('<br>');
+    box.style.display = 'block';
+  } else {
+    box.style.display = 'none';
+  }
+  return warnings;
 }
 
 document.getElementById('age-range-group').addEventListener('click', () => { setTimeout(renderAgeYears, 10); });
@@ -981,10 +1129,14 @@ function buildIndividualPrompt() {
     const outfitParts = [];
     if (state.occupation) outfitParts.push(`${state.occupation.toLowerCase()}'s`);
     if (state.outfitStyle) outfitParts.push(state.outfitStyle.toLowerCase() + ' style');
-    if (state.topFit && state.top) outfitParts.push(`${state.topFit.toLowerCase()} ${state.top.toLowerCase()}`);
-    else if (state.top) outfitParts.push(state.top.toLowerCase());
-    if (state.bottomFit && state.bottom) outfitParts.push(`${state.bottomFit.toLowerCase()} ${state.bottom.toLowerCase()}`);
-    else if (state.bottom) outfitParts.push(state.bottom.toLowerCase());
+    if (state.swimwear) {
+      outfitParts.push(state.swimwear.toLowerCase());
+    } else {
+      if (state.topFit && state.top) outfitParts.push(`${state.topFit.toLowerCase()} ${state.top.toLowerCase()}`);
+      else if (state.top) outfitParts.push(state.top.toLowerCase());
+      if (state.bottomFit && state.bottom) outfitParts.push(`${state.bottomFit.toLowerCase()} ${state.bottom.toLowerCase()}`);
+      else if (state.bottom) outfitParts.push(state.bottom.toLowerCase());
+    }
     if (state.outer) outfitParts.push(state.outer.toLowerCase());
     if (state.footwear) outfitParts.push(state.footwear.toLowerCase());
     const palObj = DATA.palettes.find(p => p.id === state.palette);
@@ -1004,6 +1156,7 @@ function buildIndividualPrompt() {
   const camParts = [];
   if (state.shot) camParts.push(state.shot.toLowerCase());
   if (state.film) camParts.push(state.film.toLowerCase());
+  if (state.lens) camParts.push(state.lens.toLowerCase() + ' lens');
   if (state.dof) camParts.push(`${state.dof.toLowerCase()} depth of field`);
   if (state.ratio) camParts.push(`${state.ratio.toLowerCase()} aspect ratio`);
   if (camParts.length) parts.push(`Shot: ${camParts.join(', ')}.`);
@@ -1040,24 +1193,27 @@ function buildEnvironmentPrompt() {
 function displayPrompt(text) {
   const el = document.getElementById('output-text');
   el.classList.remove('empty');
-  el.innerHTML = text + '<span class="output-cursor"></span>';
+  el.value = text;
+  window._lastPrompt = text;
+}
+
+function getPromptText() {
+  return document.getElementById('output-text').value || window._lastPrompt || '';
 }
 
 function generateIndividual() {
-  const prompt = buildIndividualPrompt();
-  displayPrompt(prompt);
-  window._lastPrompt = prompt;
+  checkContradictions();
+  displayPrompt(buildIndividualPrompt());
 }
 
 function generateEnvironment() {
-  const prompt = buildEnvironmentPrompt();
-  displayPrompt(prompt);
-  window._lastPrompt = prompt;
+  checkContradictions();
+  displayPrompt(buildEnvironmentPrompt());
 }
 
 // ── COPY ──────────────────────────────────────────────────
 async function copyPrompt() {
-  const text = window._lastPrompt;
+  const text = getPromptText();
   if (!text) return;
   const btn = document.querySelector('.copy-btn');
   let ok = false;
@@ -1080,7 +1236,7 @@ async function copyPrompt() {
 
 // ── SAVE / LOAD ───────────────────────────────────────────
 function savePrompt() {
-  const text = window._lastPrompt;
+  const text = getPromptText();
   if (!text) return;
   const name = document.getElementById('save-name-input').value.trim() || `Prompt ${new Date().toLocaleTimeString()}`;
   const saved = JSON.parse(localStorage.getItem('ipb-saved') || '[]');
@@ -1204,8 +1360,9 @@ function randomize() {
   document.getElementById('prefill-note').classList.remove('visible');
   renderAll();
   window._lastPrompt = null;
-  document.getElementById('output-text').innerHTML = 'Awaiting generation...<span class="output-cursor"></span>';
-  document.getElementById('output-text').classList.add('empty');
+  const out = document.getElementById('output-text');
+  out.value = '';
+  out.classList.add('empty');
 }
 
 // ── RESET ─────────────────────────────────────────────────
@@ -1216,9 +1373,9 @@ function resetAll() {
     poseFacing:null, poseBody:null, poseArms:null, poseHead:null,
     hairStyle:null, hairColor:null, hairTexture:null, hairPos:null,
     occupation:null, outfitStyle:null, top:null, topFit:null, bottom:null, bottomFit:null,
-    outer:null, palette:null, footwear:null, accessories:[], mannequin:false,
+    outer:null, palette:null, footwear:null, accessories:[], mannequin:false, swimwear:null,
     envType:null, envLocation:null, envTime:null, envWeather:null, envSeason:null, lighting:[], envVibe:null,
-    shot:null, film:null, ratio:null, dof:null,
+    shot:null, film:null, lens:null, ratio:null, dof:null,
   });
   document.getElementById('env-outdoor-btn').classList.remove('active');
   document.getElementById('env-indoor-btn').classList.remove('active');
@@ -1229,8 +1386,9 @@ function resetAll() {
   document.getElementById('age-year-select').classList.add('hidden');
   document.getElementById('prefill-note').classList.remove('visible');
   window._lastPrompt = null;
-  document.getElementById('output-text').innerHTML = 'Awaiting generation...<span class="output-cursor"></span>';
-  document.getElementById('output-text').classList.add('empty');
+  const out = document.getElementById('output-text');
+  out.value = '';
+  out.classList.add('empty');
   renderAll();
 }
 
